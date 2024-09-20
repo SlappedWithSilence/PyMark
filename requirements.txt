@@ -1,0 +1,4 @@
+pillow
+loguru
+rich
+typer
