@@ -1,6 +1,10 @@
 import os.path
 from typing import Optional, Annotated
 
+from rich.pretty import pprint
+
+from helpers.file import gather_files
+
 import typer
 
 app = typer.Typer()
@@ -49,7 +53,7 @@ def mark(
         file_types: Annotated[str, typer.Argument(
             help="A comma-delineated list of file formats to read when "
                  "searching a directory for images"
-        )] = "png,jpg,jpeg",
+        )] = ".png,.jpg,.jpeg",
         output_file_type: Annotated[str, typer.Argument(
             help="Which file format to write the output files in. See Pillow "
                  "supported file formats for more info."
@@ -97,6 +101,14 @@ def mark(
         raise NotADirectoryError("Input path was a directory and output path "
                                  "was a file. User must supply a path that "
                                  "points to a directory.")
+
+    pprint(
+        gather_files(
+            in_path,
+            file_types.split(','),
+            pattern
+        )
+    )
 
 
 if __name__ == "__main__":
