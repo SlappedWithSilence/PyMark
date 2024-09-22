@@ -52,9 +52,10 @@ def gather_files(path: str,
     all_file_names = os.listdir(path)
 
     # Filter by extension
+    # Case-insensitive
     valid_names = [
         fname for fname in all_file_names if any(
-            [fname.endswith(ext) for ext in allowed_extensions]
+            [fname.lower().endswith(ext.lower()) for ext in allowed_extensions]
         )
     ]
 
