@@ -102,14 +102,28 @@ def mark(
                                  "was a file. User must supply a path that "
                                  "points to a directory.")
 
-    pprint(
-        gather_files(
-            in_path,
-            file_types.split(','),
-            pattern
-        )
-    )
+    files: list[str] = None  # A list of all files that need to be processed
 
+    if not is_input_dir:
+        files = [in_path]
+    else:
+        files = gather_files(
+                in_path,
+                file_types.split(','),
+                pattern
+            )
+
+    pprint(files)
+
+    for file in files:
+        pass
+        # For each file, open
+
+        # Add watermark
+
+        # Check for naming collisions
+
+        # Save new file
 
 if __name__ == "__main__":
     """
