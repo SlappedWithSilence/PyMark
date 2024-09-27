@@ -1,11 +1,15 @@
+"""
+Main driver code for the Typer implementation.
+"""
 import os.path
 from typing import Optional, Annotated
 
+import typer
 from rich.pretty import pprint
 
 from helpers.file import gather_files
 
-import typer
+
 
 app = typer.Typer()
 
@@ -108,10 +112,10 @@ def mark(
         files = [in_path]
     else:
         files = gather_files(
-                in_path,
-                file_types.split(','),
-                pattern
-            )
+            in_path,
+            file_types.split(','),
+            pattern
+        )
 
     pprint(files)
 
@@ -125,8 +129,6 @@ def mark(
 
         # Save new file
 
+
 if __name__ == "__main__":
-    """
-    Driver code. Defers to the Typer launcher
-    """
     app()
