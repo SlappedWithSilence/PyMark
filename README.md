@@ -14,10 +14,19 @@ PyMark supports multiple watermarking modes.
  
 TODO
 
-## Developing
+## Contributing
 
-TODO
+When contributing to PyMark, ensure that your code passes all tests and does not generate any new linter warnings. It is strongly suggested that you run both [PyLint](https://www.pylint.org/) and [Ruff](https://docs.astral.sh/ruff/installation/) before submitting a MR. 
 
+To set up both linters, run the following commands from the root directory of the repo:
+- `pip install pylint`
+- `pip install ruff`
+
+To use the linters:
+- `pylint src`
+- `ruff format && ruff check`
+
+**TIP**: _You can also configure Ruff to [run as a pre-commit hook.](https://docs.astral.sh/ruff/integrations/#pre-commit)_
 ## Testing
 
 TODO
@@ -28,5 +37,10 @@ Project doesn't exist
 
 ## Acknowledgements
 
-TODO
+- Typer - Excellent CLI library
+- Pillow - Python Imaging Library
+- Ruff - Blazing Fast Linting and Formatting
+- PyLint - Content-aware Linting
+- PyTest - Testing Framework
+- Coverage - Code Coverage Metrics
 
