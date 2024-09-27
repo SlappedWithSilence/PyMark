@@ -1,14 +1,15 @@
 """
 A collection of helper functions relating to managing files
 """
+
 import os.path
 import re
 from typing import Optional
 
 
-def gather_files(path: str,
-                 allowed_extensions: list[str],
-                 pattern: Optional[str]) -> list[str]:
+def gather_files(
+    path: str, allowed_extensions: list[str], pattern: Optional[str]
+) -> list[str]:
     """
     For a given path, locate all valid files.
 
@@ -25,17 +26,21 @@ def gather_files(path: str,
         raise TypeError(f"path must be a str, not a {type(path)}")
 
     if not isinstance(allowed_extensions, list):
-        raise TypeError(f"allowed_extensions must be a list, not a "
-                        f"{type(allowed_extensions)}")
+        raise TypeError(
+            f"allowed_extensions must be a list, not a " f"{type(allowed_extensions)}"
+        )
 
     if pattern and not isinstance(pattern, str):
-        raise TypeError(f"pattern must be a str or None! Got {type(pattern)} "
-                        f"instead!")
+        raise TypeError(
+            f"pattern must be a str or None! Got {type(pattern)} " f"instead!"
+        )
 
     # Value validation
     if not os.path.isdir(path):
-        raise NotADirectoryError(f"Path must point to an existing directory! "
-                                 f"{path} doesn't exist or is a file!")
+        raise NotADirectoryError(
+            f"Path must point to an existing directory! "
+            f"{path} doesn't exist or is a file!"
+        )
 
     if len(allowed_extensions) < 1:
         raise IndexError("allowed_extensions must be of length > 0")
@@ -54,19 +59,17 @@ def gather_files(path: str,
     # Filter by extension
     # Case-insensitive
     valid_names = [
-        fname for fname in all_file_names if any(
-            [fname.lower().endswith(ext.lower()) for ext in allowed_extensions]
-        )
+        fname
+        for fname in all_file_names
+        if any([fname.lower().endswith(ext.lower()) for ext in allowed_extensions])
     ]
 
     # Filter by regex
     if regex:
         valid_names = [
-            ".".join(
-                fname.split(".")[:-1]
-            ) for fname in valid_names if regex.fullmatch(
-                ".".join(fname.split(".")[:-1])
-            )
+            ".".join(fname.split(".")[:-1])
+            for fname in valid_names
+            if regex.fullmatch(".".join(fname.split(".")[:-1]))
         ]
 
     # Return a list of paths, not of names, to the files
