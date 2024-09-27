@@ -7,8 +7,9 @@ from typing import Optional, Annotated
 
 import typer
 from rich.pretty import pprint
+from loguru import logger
 
-from helpers.file import gather_files
+from helpers.file import gather_files, update_file_name, get_path_collisions
 
 
 app = typer.Typer()
@@ -124,11 +125,29 @@ def mark(
         )
 
     files: list[str] = None  # A list of all files that need to be processed
-
+    target_dir: str = None
     if not is_input_dir:
-        files = [in_path]
+        parts: list[str] = in_path.split("/")
+        files = [parts[-1]]
+        target_dir = ("/".join(parts[:-1]))
     else:
         files = gather_files(in_path, file_types.split(","), pattern)
+
+    # Pre-compute output file names to check for name collisions before doing
+    # any work.
+    if not overwrite:
+        output_file_names: list[str] = get_path_collisions(
+            target_dir, files, output_file_type
+        )
+
+        if output_file_names:
+            logger.error("Name collision detected. The following files already "
+                         "exist:")
+            for name in output_file_names:
+                logger.error(name)
+            logger.error("To ignore file name collisions, run with --overwrite "
+                         "true")
+            exit(-1)
 
     pprint(files)
 

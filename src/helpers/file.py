@@ -4,11 +4,51 @@ A collection of helper functions relating to managing files
 
 import os.path
 import re
-from typing import Optional
+from typing import Optional, Iterable
+
+
+def update_file_name(
+        original_name: str, prefix: str | None, suffix: str | None
+) -> str:
+    """
+    For some arbitrary file name, modify it according to the supplied prefix
+    and suffix values.
+
+    :param original_name: Original file name
+    :param prefix: Prefix to prepend to file name
+    :param suffix: Suffix to append to file name
+    :return: Modified file name
+    """
+
+    return (prefix or "") + original_name + (suffix or "")
+
+
+def get_path_collisions(
+        target_dir: str, file_names: Iterable[str], file_extension: str
+) -> list[str] | None:
+    """
+    For each file name, check if that name is taken within a target directory.
+
+    :param target_dir: Absolute or relative path to directory to check
+    :param file_names: An iterable collection of file names
+    :param file_extension: The extension to save the file as
+    :return: A list of names that are already taken. If no names are taken, None
+    """
+
+    true_dir = target_dir if target_dir.endswith("/") else target_dir + "/"
+
+    if not os.path.isdir(target_dir):
+        raise NotADirectoryError("target_dir must be a valid directory!")
+
+    collisions = [
+        f"{true_dir}{fname}{file_extension}" for fname in file_names if os.path.isfile(f"{true_dir}{fname}{file_extension}")
+    ]
+
+    return collisions if len(collisions) > 0 else None
 
 
 def gather_files(
-    path: str, allowed_extensions: list[str], pattern: Optional[str]
+        path: str, allowed_extensions: list[str], pattern: Optional[str]
 ) -> list[str]:
     """
     For a given path, locate all valid files.
@@ -61,7 +101,9 @@ def gather_files(
     valid_names = [
         fname
         for fname in all_file_names
-        if any([fname.lower().endswith(ext.lower()) for ext in allowed_extensions])
+        if any(
+            (fname.lower().endswith(ext.lower()) for ext in allowed_extensions)
+        )
     ]
 
     # Filter by regex
