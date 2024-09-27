@@ -35,6 +35,12 @@ def get_path_collisions(
     :return: A list of names that are already taken. If no names are taken, None
     """
 
+    if not isinstance(target_dir, str):
+        raise TypeError("target_dir must be a path of type str!")
+
+    if not isinstance(file_extension, str):
+        raise TypeError("file_extension must be of type str!")
+
     true_dir = target_dir if target_dir.endswith("/") else target_dir + "/"
 
     if not os.path.isdir(target_dir):
