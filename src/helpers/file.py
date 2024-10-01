@@ -7,9 +7,7 @@ import re
 from typing import Optional, Iterable
 
 
-def update_file_name(
-        original_name: str, prefix: str | None, suffix: str | None
-) -> str:
+def update_file_name(original_name: str, prefix: str | None, suffix: str | None) -> str:
     """
     For some arbitrary file name, modify it according to the supplied prefix
     and suffix values.
@@ -24,7 +22,7 @@ def update_file_name(
 
 
 def get_path_collisions(
-        target_dir: str, file_names: Iterable[str], file_extension: str
+    target_dir: str, file_names: Iterable[str], file_extension: str
 ) -> list[str] | None:
     """
     For each file name, check if that name is taken within a target directory.
@@ -47,14 +45,16 @@ def get_path_collisions(
         raise NotADirectoryError("target_dir must be a valid directory!")
 
     collisions = [
-        f"{true_dir}{fname}{file_extension}" for fname in file_names if os.path.isfile(f"{true_dir}{fname}{file_extension}")
+        f"{true_dir}{fname}{file_extension}"
+        for fname in file_names
+        if os.path.isfile(f"{true_dir}{fname}{file_extension}")
     ]
 
     return collisions if len(collisions) > 0 else None
 
 
 def gather_files(
-        path: str, allowed_extensions: list[str], pattern: Optional[str]
+    path: str, allowed_extensions: list[str], pattern: Optional[str]
 ) -> list[str]:
     """
     For a given path, locate all valid files.
@@ -107,9 +107,7 @@ def gather_files(
     valid_names = [
         fname
         for fname in all_file_names
-        if any(
-            (fname.lower().endswith(ext.lower()) for ext in allowed_extensions)
-        )
+        if any((fname.lower().endswith(ext.lower()) for ext in allowed_extensions))
     ]
 
     # Filter by regex
