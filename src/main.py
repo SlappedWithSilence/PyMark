@@ -3,6 +3,7 @@ Main driver code for the Typer implementation.
 """
 
 import os.path
+import sys
 from typing import Optional, Annotated
 
 import typer
@@ -129,7 +130,7 @@ def mark(
     if not is_input_dir:
         parts: list[str] = in_path.split("/")
         files = [parts[-1]]
-        target_dir = ("/".join(parts[:-1]))
+        target_dir = "/".join(parts[:-1])
     else:
         files = gather_files(in_path, file_types.split(","), pattern)
 
@@ -141,13 +142,13 @@ def mark(
         )
 
         if output_file_names:
-            logger.error("Name collision detected. The following files already "
-                         "exist:")
+            logger.error(
+                "Name collision detected. The following files already exist:"
+            )
             for name in output_file_names:
                 logger.error(name)
-            logger.error("To ignore file name collisions, run with --overwrite "
-                         "true")
-            exit(-1)
+            logger.error("To ignore file name collisions, run with --overwrite " "true")
+            sys.exit(-1)
 
     pprint(files)
 
