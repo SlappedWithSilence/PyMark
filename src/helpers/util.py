@@ -11,7 +11,7 @@ from PIL import Image
 
 
 def make_debug_image(
-        name: str, path: str, width: int = 100, height: int = 100, extension: str = ".png"
+    name: str, path: str, width: int = 100, height: int = 100, extension: str = ".png"
 ) -> None:
     """
     Generate a blank white debug image at the specified path with the specified dimensions.

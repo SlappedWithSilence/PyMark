@@ -13,7 +13,6 @@ from pathvalidate.click import validate_filepath_arg
 
 from helpers.file import gather_files, get_path_collisions
 from helpers.image import apply_watermark
-from helpers.util import gather_watermark_args
 
 app = typer.Typer()
 
@@ -23,32 +22,37 @@ is_input_dir: bool = None
 @app.command()
 def mark(
     mark_path: Annotated[
-        str, typer.Argument(
+        str,
+        typer.Argument(
             help="mark_path: Path to the image to use as a watermark",
-            callback=validate_filepath_arg
-        )
+            callback=validate_filepath_arg,
+        ),
     ],
     corner: Annotated[
         str,
         typer.Option(
-            "--corner", "-c",
+            "--corner",
+            "-c",
             help="Which corner to overlay the image on.",
         ),
     ] = "bottom_right",
     in_path: Annotated[
         str,
         typer.Option(
-            "--in-path", "-i",
+            "--in-path",
+            "-i",
             help="Path to image(s) to watermark.",
-            callback=validate_filepath_arg
-        )
+            callback=validate_filepath_arg,
+        ),
     ] = "./",
     out_path: Annotated[
-        str, typer.Option(
-            "--out-path", "-o",
+        str,
+        typer.Option(
+            "--out-path",
+            "-o",
             help="Path to save watermarked image(s)",
-            callback=validate_filepath_arg
-        )
+            callback=validate_filepath_arg,
+        ),
     ] = "./",
     overwrite: Annotated[
         bool,
@@ -169,11 +173,11 @@ def mark(
             sys.exit(-1)
 
         for file_path in files:
-
-            threading.Thread(target=apply_watermark,
-                             name=f"Watermark: {file_path}",
-                             args=(file_path, mark_path, corner, 0.05)
-                             )
+            threading.Thread(
+                target=apply_watermark,
+                name=f"Watermark: {file_path}",
+                args=(file_path, mark_path, corner, 0.05),
+            )
 
         # For each file, open
 
