@@ -1,5 +1,5 @@
 # PyMark
-## A Python utility to batch watermark images in a directory
+_A Python utility to batch watermark images in a directory_
 
 PyMark supports multiple watermarking modes. 
 
@@ -10,9 +10,17 @@ PyMark supports multiple watermarking modes.
 - Center Watermarking
   - Overlay an image or arbitrary text centered on the image with adjustable transparency
 
-## Usage
+# Usage
  
-TODO
+## Mark
+The main watermarking command.
+
+### Args & Options
+- `mark`: File path to the image to use as the watermark
+- `--in-path`, `-i`: Path to the file or directory for which to watermark files
+- `--out-path`, `-o`: Path to the directory in which to write the watermarked images
+- `--corner`: The corner of the image in which to anchor the watermark
+- 
 
 ## Contributing
 
