@@ -43,9 +43,7 @@ def make_debug_image(
         raise TypeError()
 
     if extension.replace(".", "").lower() not in ["png", "jpeg"]:
-        raise ValueError(
-            f"extension must be png or jpeg! Got {extension} instead!"
-        )
+        raise ValueError(f"extension must be png or jpeg! Got {extension} instead!")
 
     # Clean inputs
     true_path: str = path if path.endswith("/") else path + "/"

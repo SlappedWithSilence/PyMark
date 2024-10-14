@@ -92,7 +92,7 @@ def gather_files(
         raise IndexError("allowed_extensions must be of length > 0")
 
     # Make sure that the path ends with a slash
-    proper_path = path if path[-1] in ["/" or "\\"] else path + "/"
+    proper_path = path if path[-1] in [r"/" or "\\"] else path + "/"
 
     # Compile the regex if it supplied
     regex: Optional[re.Pattern] = None

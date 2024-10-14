@@ -43,4 +43,4 @@ Project doesn't exist
 - PyLint - Content-aware Linting
 - PyTest - Testing Framework
 - Coverage - Code Coverage Metrics
-
+- [pathvalidate](https://pypi.org/project/pathvalidate/) - Cross-platform path sanitization
