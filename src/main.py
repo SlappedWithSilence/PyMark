@@ -4,15 +4,16 @@ Main driver code for the Typer implementation.
 
 import os.path
 import sys
+import threading
 from typing import Optional, Annotated
 
 import typer
-from rich.pretty import pprint
 from loguru import logger
 from pathvalidate.click import validate_filepath_arg
 
 from helpers.file import gather_files, get_path_collisions
-
+from helpers.image import apply_watermark
+from helpers.util import gather_watermark_args
 
 app = typer.Typer()
 
@@ -167,10 +168,13 @@ def mark(
             logger.error("To ignore file name collisions, run with --overwrite " "true")
             sys.exit(-1)
 
-    pprint(files)
+        for file_path in files:
 
-    for file in files:
-        pass
+            threading.Thread(target=apply_watermark,
+                             name=f"Watermark: {file_path}",
+                             args=(file_path, mark_path, corner, 0.05)
+                             )
+
         # For each file, open
 
         # Add watermark
