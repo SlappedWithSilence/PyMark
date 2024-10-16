@@ -11,7 +11,7 @@ from PIL import Image
 
 
 def make_debug_image(
-    name: str, path: str, width: int = 100, height: int = 100, extension: str = ".png"
+    name: str, path: str, width: int = 100, height: int = 100, extension: str = ".png", color: tuple[int, int, int] = (255, 255, 255)
 ) -> None:
     """
     Generate a blank white debug image at the specified path with the specified dimensions.
@@ -22,7 +22,7 @@ def make_debug_image(
         width: Width of the image
         height: Height of the image
         extension: Format extension to save the image to
-
+        color: What solid color to make the images
     Returns: None
     """
 
@@ -56,10 +56,10 @@ def make_debug_image(
         logger.error(
             f"Failed to generate debug image at path: {full_path}. File already exists"
         )
-        sys.exit(1)
+        return
 
     # Generate a white image and save it
-    im = Image.new("RGB", (width, height), (255, 255, 255))
+    im = Image.new("RGB", (width, height), color)
     im.save(full_path, true_extension[1:])
 
 
@@ -67,3 +67,5 @@ if __name__ == "__main__":
     os.makedirs("../../debug/", exist_ok=True)
     for i in range(10):
         make_debug_image(str(i), "../../debug", extension="jpeg")
+
+    make_debug_image("watermark", "../../", extension="jpeg", color=(0,0,0))
