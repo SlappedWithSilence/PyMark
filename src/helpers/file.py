@@ -1,10 +1,12 @@
 """
 A collection of helper functions relating to managing files
 """
-
+import dataclasses
 import os.path
 import re
 from typing import Optional, Iterable
+
+from pathvalidate import validate_filepath
 
 
 def update_file_name(original_name: str, prefix: str | None, suffix: str | None) -> str:
@@ -21,49 +23,102 @@ def update_file_name(original_name: str, prefix: str | None, suffix: str | None)
     return (prefix or "") + original_name + (suffix or "")
 
 
-def get_path_collisions(
-    target_dir: str, file_names: Iterable[str], file_extension: str
-) -> list[str] | None:
+@dataclasses.dataclass
+class FileSpec:
     """
-    For each file name, check if that name is taken within a target directory.
-
-    :param target_dir: Absolute or relative path to directory to check
-    :param file_names: An iterable collection of file names
-    :param file_extension: The extension to save the file as
-    :return: A list of names that are already taken. If no names are taken, None
+    Struct for storing distinct file properties.
     """
+    dir: str  # Path to the directory that contains the file
+    name: str  # Name of the file (no extension)
+    extension: str  # Extension of the file (without .)
 
-    if not isinstance(target_dir, str):
-        raise TypeError("target_dir must be a path of type str!")
+    def __post_init__(self):
+        if not isinstance(self.dir, str):
+            raise TypeError
 
-    if not isinstance(file_extension, str):
-        raise TypeError("file_extension must be of type str!")
+        if not isinstance(self.name, str):
+            raise TypeError
 
-    true_dir = target_dir if target_dir.endswith("/") else target_dir + "/"
+        if not isinstance(self.extension, str):
+            raise TypeError
 
-    if not os.path.isdir(target_dir):
-        raise NotADirectoryError("target_dir must be a valid directory!")
+    def __str__(self):
+        return (self.dir if self.dir[-1] in ["/", "\\"] else self.dir + "/") + self.name + "." + self.extension
 
-    collisions = [
-        f"{true_dir}{fname}{file_extension}"
-        for fname in file_names
-        if os.path.isfile(f"{true_dir}{fname}{file_extension}")
-    ]
+    @property
+    def exists(self) -> bool:
+        """
+        Return True if a file already exists at the given path
 
-    return collisions if len(collisions) > 0 else None
+        :return: True if file already exists
+        """
+
+        return self.valid and os.path.exists(self.__str__())
+
+    @property
+    def valid(self) -> bool:
+        """
+        Check if full file path is valid
+
+        :return: True if the full file path is valid
+
+        """
+        try:
+            validate_filepath(self.__str__())
+            return True
+
+        except ValueError:
+            return False
+
+    @classmethod
+    def from_path(cls, path: str) -> "FileSpec":
+        """
+        Factory method that takes a path and returns a FileSpec object
+
+        :param path: Path to ingest
+        :return: A new FileSpec object built from the path
+        """
+        ext = ""
+        name = None
+        dir_ = "./"
+
+        # If the path to the file has an extension
+        if "." in path:
+            ext = path.split(".")[-1]
+
+        # If the path to the file does contain a subdir
+        if "/" in path or "\\" in path:
+
+            # Clean path
+            clean_path = path.replace("\\", "/")
+
+            # Split string by dir
+            parts = clean_path.split("/")
+
+            # Extract name from final entry assuming an ext
+            name = parts[-1].split(".")[0]
+
+            # Re-assemble split parts by joining with a slash and excluding final entry (which contains name and ext)
+            dir_ = "/".join(parts[:-1])
+
+        # If no subdirs, just split the name away from the ext and assign it
+        else:
+            name = path.split(".")[0]
+
+        return FileSpec(dir_, name, ext)
 
 
 def gather_files(
-    path: str, allowed_extensions: list[str], pattern: Optional[str]
-) -> list[str]:
+        path: str, allowed_extensions: list[str], pattern: Optional[str]
+) -> list[FileSpec]:
     """
-    For a given path, locate all valid files.
+    For a given path, locate all valid files and return .
 
     :param path: Path to target directory. Absolute and relative both allowed.
     :param allowed_extensions: A list of allowed extensions. Must have len >= 1
     :param pattern: Optional regex to filter files names
 
-    :returns: A list of paths to files with valid names and file extensions in
+    :returns: A list of FileSpecs to files with valid names and file extensions in
         the given directory
     """
 
@@ -119,4 +174,22 @@ def gather_files(
         ]
 
     # Return a list of paths, not of names, to the files
-    return [proper_path + fname for fname in valid_names]
+    return [FileSpec.from_path(proper_path + fname) for fname in valid_names]
+
+
+def to_output_path(file_spec: FileSpec, out_path, prefix: str, suffix: str, ext: str) -> FileSpec:
+    """
+    Converts an input FileSpec to an output FileSpec based on cli args
+    :param file_spec: The input FileSpec
+    :param out_path: The outpath specified in the CLI
+    :param prefix: file name prefix
+    :param suffix: file name suffix
+    :param ext: file extension
+    :return: A modified FileSpec
+    """
+
+    return FileSpec(
+        out_path,
+        f"{prefix}{file_spec.name}{suffix}",
+        ext
+    )
