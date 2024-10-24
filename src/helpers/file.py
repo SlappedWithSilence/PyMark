@@ -1,10 +1,12 @@
 """
 A collection of helper functions relating to managing files
 """
+
 import dataclasses
 import os.path
 import re
-from typing import Optional, Iterable
+from pathlib import Path, PurePath
+from typing import Optional
 
 from pathvalidate import validate_filepath
 
@@ -28,6 +30,7 @@ class FileSpec:
     """
     Struct for storing distinct file properties.
     """
+
     dir: str  # Path to the directory that contains the file
     name: str  # Name of the file (no extension)
     extension: str  # Extension of the file (without .)
@@ -43,7 +46,12 @@ class FileSpec:
             raise TypeError
 
     def __str__(self):
-        return (self.dir if self.dir[-1] in ["/", "\\"] else self.dir + "/") + self.name + "." + self.extension
+        return (
+            (self.dir if self.dir[-1] in ["/", "\\"] else self.dir + "/")
+            + self.name
+            + "."
+            + self.extension
+        )
 
     @property
     def exists(self) -> bool:
@@ -71,7 +79,7 @@ class FileSpec:
             return False
 
     @classmethod
-    def from_path(cls, path: str) -> "FileSpec":
+    def from_str(cls, path: str) -> "FileSpec":
         """
         Factory method that takes a path and returns a FileSpec object
 
@@ -88,7 +96,6 @@ class FileSpec:
 
         # If the path to the file does contain a subdir
         if "/" in path or "\\" in path:
-
             # Clean path
             clean_path = path.replace("\\", "/")
 
@@ -107,9 +114,19 @@ class FileSpec:
 
         return FileSpec(dir_, name, ext)
 
+    @classmethod
+    def from_path(cls, path: Path | PurePath) -> "FileSpec":
+        """
+        Factory method that takes a path and returns a FileSpec object
+
+        :param path: Path to ingest
+        :return: A new FileSpec object built from the path
+        """
+        return cls.from_str(path.as_uri())
+
 
 def gather_files(
-        path: str, allowed_extensions: list[str], pattern: Optional[str]
+    path: str, allowed_extensions: list[str], pattern: Optional[str]
 ) -> list[FileSpec]:
     """
     For a given path, locate all valid files and return .
@@ -174,10 +191,12 @@ def gather_files(
         ]
 
     # Return a list of paths, not of names, to the files
-    return [FileSpec.from_path(proper_path + fname) for fname in valid_names]
+    return [FileSpec.from_str(proper_path + fname) for fname in valid_names]
 
 
-def to_output_path(file_spec: FileSpec, out_path, prefix: str, suffix: str, ext: str) -> FileSpec:
+def to_output_path(
+    file_spec: FileSpec, out_path, prefix: str, suffix: str, ext: str
+) -> FileSpec:
     """
     Converts an input FileSpec to an output FileSpec based on cli args
     :param file_spec: The input FileSpec
@@ -188,8 +207,4 @@ def to_output_path(file_spec: FileSpec, out_path, prefix: str, suffix: str, ext:
     :return: A modified FileSpec
     """
 
-    return FileSpec(
-        out_path,
-        f"{prefix}{file_spec.name}{suffix}",
-        ext
-    )
+    return FileSpec(out_path, f"{prefix}{file_spec.name}{suffix}", ext)
