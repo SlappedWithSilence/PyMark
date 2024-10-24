@@ -11,7 +11,7 @@ import typer
 from loguru import logger
 from pathvalidate.click import validate_filepath_arg
 
-from helpers.file import gather_files, get_path_collisions, FileSpec, to_output_path
+from helpers.file import gather_files, FileSpec, to_output_path
 from helpers.image import apply_watermark
 
 app = typer.Typer()
@@ -21,91 +21,91 @@ is_input_dir: bool = None
 
 @app.command()
 def mark(
-        mark_path: Annotated[
-            str,
-            typer.Argument(
-                help="mark_path: Path to the image to use as a watermark",
-                callback=validate_filepath_arg,
-            ),
-        ],
-        corner: Annotated[
-            str,
-            typer.Option(
-                "--corner",
-                "-c",
-                help="Which corner to overlay the image on.",
-            ),
-        ] = "bottom_right",
-        in_path: Annotated[
-            str,
-            typer.Option(
-                "--in-path",
-                "-i",
-                help="Path to image(s) to watermark.",
-                callback=validate_filepath_arg,
-            ),
-        ] = "./",
-        out_path: Annotated[
-            str,
-            typer.Option(
-                "--out-path",
-                "-o",
-                help="Path to save watermarked image(s)",
-                callback=validate_filepath_arg,
-            ),
-        ] = "./",
-        overwrite: Annotated[
-            bool,
-            typer.Option(
-                help="If True, overwrite any existing files with the same name "
-                     "as the output files"
-            ),
-        ] = False,
-        pattern: Annotated[
-            Optional[str],
-            typer.Option(
-                help="A regex to use as a filter for which images to select for"
-                     " watermarking"
-            ),
-        ] = None,
-        prefix: Annotated[
-            Optional[str],
-            typer.Option(
-                help="An optional string that is prepended to the file name of "
-                     "the output file(s)"
-            ),
-        ] = "",
-        suffix: Annotated[
-            Optional[str],
-            typer.Option(
-                help="An optional string that is appended to the file name of the "
-                     "output files"
-            ),
-        ] = "",
-        file_types: Annotated[
-            str,
-            typer.Option(
-                help="A comma-delineated list of file formats to read when "
-                     "searching a directory for images"
-            ),
-        ] = ".png,.jpg,.jpeg",
-        output_file_type: Annotated[
-            str,
-            typer.Option(
-                help="Which file format to write the output files in. See Pillow "
-                     "supported file formats for more info."
-            ),
-        ] = ".jpg",
-        preset: Annotated[
-            Optional[str],
-            typer.Option(
-                "--preset",
-                "-p",
-                help="The name of a preset to use. Any supplied configuration "
-                     "values will take precedence over the existing preset "
-                     "values.",
-            ),
-        ] = None,
+    mark_path: Annotated[
+        str,
+        typer.Argument(
+            help="mark_path: Path to the image to use as a watermark",
+            callback=validate_filepath_arg,
+        ),
+    ],
+    corner: Annotated[
+        str,
+        typer.Option(
+            "--corner",
+            "-c",
+            help="Which corner to overlay the image on.",
+        ),
+    ] = "bottom_right",
+    in_path: Annotated[
+        str,
+        typer.Option(
+            "--in-path",
+            "-i",
+            help="Path to image(s) to watermark.",
+            callback=validate_filepath_arg,
+        ),
+    ] = "./",
+    out_path: Annotated[
+        str,
+        typer.Option(
+            "--out-path",
+            "-o",
+            help="Path to save watermarked image(s)",
+            callback=validate_filepath_arg,
+        ),
+    ] = "./",
+    overwrite: Annotated[
+        bool,
+        typer.Option(
+            help="If True, overwrite any existing files with the same name "
+            "as the output files"
+        ),
+    ] = False,
+    pattern: Annotated[
+        Optional[str],
+        typer.Option(
+            help="A regex to use as a filter for which images to select for"
+            " watermarking"
+        ),
+    ] = None,
+    prefix: Annotated[
+        Optional[str],
+        typer.Option(
+            help="An optional string that is prepended to the file name of "
+            "the output file(s)"
+        ),
+    ] = "",
+    suffix: Annotated[
+        Optional[str],
+        typer.Option(
+            help="An optional string that is appended to the file name of the "
+            "output files"
+        ),
+    ] = "",
+    file_types: Annotated[
+        str,
+        typer.Option(
+            help="A comma-delineated list of file formats to read when "
+            "searching a directory for images"
+        ),
+    ] = ".png,.jpg,.jpeg",
+    output_file_type: Annotated[
+        str,
+        typer.Option(
+            help="Which file format to write the output files in. See Pillow "
+            "supported file formats for more info."
+        ),
+    ] = ".jpg",
+    preset: Annotated[
+        Optional[str],
+        typer.Option(
+            "--preset",
+            "-p",
+            help="The name of a preset to use. Any supplied configuration "
+            "values will take precedence over the existing preset "
+            "values.",
+        ),
+    ] = None,
 ) -> None:
     """
     Watermark one or more images.

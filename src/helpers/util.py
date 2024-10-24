@@ -3,7 +3,6 @@ A collection of helper methods with general utility.
 """
 
 import os.path
-import sys
 
 from loguru import logger
 
@@ -11,7 +10,12 @@ from PIL import Image
 
 
 def make_debug_image(
-    name: str, path: str, width: int = 100, height: int = 100, extension: str = ".png", color: tuple[int, int, int] = (255, 255, 255)
+    name: str,
+    path: str,
+    width: int = 100,
+    height: int = 100,
+    extension: str = ".png",
+    color: tuple[int, int, int] = (255, 255, 255),
 ) -> None:
     """
     Generate a blank white debug image at the specified path with the specified dimensions.
@@ -68,4 +72,4 @@ if __name__ == "__main__":
     for i in range(10):
         make_debug_image(str(i), "../../debug", extension="jpeg")
 
-    make_debug_image("watermark", "../../", extension="jpeg", color=(0,0,0))
+    make_debug_image("watermark", "../../", extension="jpeg", color=(0, 0, 0))
