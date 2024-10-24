@@ -57,19 +57,22 @@ def apply_watermark(
             watermark_length, watermark_width = watermark.size
 
             # Determine which side of the image is shortest
-            shortest_side = "l" if im_length <= im_width else "w"
+            shortest_side: str = "l" if im_length <= im_width else "w"
 
             # Calculate the projected size of the corresponding side of the watermark
             watermark_adjusted_len: float = (im_length if shortest_side == "l" else im_width) * relative_size
 
             # Determine ratio of current watermark size to expected watermark size
-            watermark_scalar = (watermark_length if shortest_side == "l" else watermark_width) / watermark_adjusted_len
+            watermark_scalar: float = (watermark_length if shortest_side == "l" else watermark_width) / watermark_adjusted_len
 
             # Calculate expected dimensions of post-scaled watermark
-            watermark_dims = (watermark_length / watermark_scalar, watermark_width / watermark_scalar)
+            watermark_dims: tuple[int, int] = (
+                round(watermark_length / watermark_scalar),
+                round(watermark_width / watermark_scalar)
+            )
 
             # Calculate size of padding based on shortest side of image
-            padding_size = (im_length if shortest_side == "l" else im_width) * padding
+            padding_size: int = round((im_length if shortest_side == "l" else im_width) * padding)
 
 
 
