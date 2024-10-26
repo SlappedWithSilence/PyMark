@@ -1,5 +1,0 @@
-pillow
-loguru
-rich
-typer
-pathvalidate

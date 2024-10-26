@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "pymark"
+version = "0.1.0"
+description = ""
+authors = ["Slapped With Silence <asigal55+02@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pathvalidate = "^3.2.1"
+typer = "^0.12.5"
+loguru = "^0.7.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
+dependencies = [
+    "pillow",
+    "loguru",
+    "rich",
+    "typer",
+    "pathvalidate"
+]
+
+[project.optional-dependencies]
+ci = [
+    "pytest",
+    "ruff",
+    "pylint"
+]

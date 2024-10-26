@@ -11,7 +11,7 @@ import typer
 from loguru import logger
 from pathvalidate.click import validate_filepath_arg
 
-from helpers.file import gather_files, FileSpec, to_output_path
+from helpers.file import gather_files
 from helpers.image import apply_watermark
 
 app = typer.Typer()
