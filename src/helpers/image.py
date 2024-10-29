@@ -1,4 +1,4 @@
-from file import FileSpec
+from pathlib import PurePath
 
 from PIL import Image
 
@@ -6,9 +6,9 @@ ALLOWED_CORNERS: list[str] = ["bottom_left", "bottom_right", "top_left", "top_ri
 
 
 def apply_watermark(
-    file_spec_in: FileSpec,
-    file_spec_out: FileSpec,
-    watermark_path: str,
+    path_in: PurePath,
+    path_out: PurePath,
+    watermark_path: PurePath,
     corner: str,
     padding: float,
     relative_size: float,
@@ -18,8 +18,8 @@ def apply_watermark(
 
     No path checking is performed. All of that should have happened before calling this function.
 
-    :param file_spec_out:
-    :param file_spec_in:
+    :param path_in: Path to the input file
+    :param path_out: Path to the save the new file to
     :param watermark_path: Path to the watermark
     :param corner: Which corner to anchor the watermark to
     :param padding: The size of the gap between the watermark and the edge of the image
@@ -27,19 +27,20 @@ def apply_watermark(
     :return: None
     """
 
-    if not isinstance(file_spec_in, FileSpec):
+    # Type Checking
+    if not isinstance(path_in, PurePath):
         raise TypeError(
-            f"file_spec_in must be a FileSpec. Got a {type(file_spec_in)} instead."
+            f"file_spec_in must be a PurePath. Got a {type(path_in)} instead."
         )
 
-    if not isinstance(file_spec_out, FileSpec):
+    if not isinstance(path_out, PurePath):
         raise TypeError(
-            f"file_spec_out must be a FileSpec. Got a {type(file_spec_out)} instead."
+            f"file_spec_out must be a PurePath. Got a {type(path_out)} instead."
         )
 
     if not isinstance(watermark_path, str):
         raise TypeError(
-            f"watermark_path must be a str. Got a {type(watermark_path)} instead."
+            f"watermark_path must be a PurePath. Got a {type(watermark_path)} instead."
         )
 
     if not isinstance(corner, str):
@@ -53,6 +54,7 @@ def apply_watermark(
             f"relative_size must be a float. Got {type(relative_size)} instead."
         )
 
+    # Value checking
     if corner.lower() not in ALLOWED_CORNERS:
         raise ValueError(f"Invalid corner value. Allowed values are: {ALLOWED_CORNERS}")
 
@@ -66,7 +68,7 @@ def apply_watermark(
             f"Invalid relative_size value. Must be a float less than 1.0. Got {relative_size}"
         )
 
-    with Image.open(str(file_spec_in)) as image:
+    with Image.open(path_in) as image:
         with Image.open(watermark_path) as watermark:
             im_length, im_width = image.size
             watermark_length, watermark_width = watermark.size
