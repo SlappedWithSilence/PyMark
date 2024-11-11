@@ -5,6 +5,7 @@ Main driver code for the Typer implementation.
 import os.path
 import sys
 import threading
+from pathlib import PurePath
 from typing import Optional, Annotated
 
 import typer
@@ -149,22 +150,20 @@ def mark(
             "points to a directory."
         )
 
-    files: list[FileSpec] = []  # A list of all files that need to be processed
+    input_file_paths: list[PurePath] = []  # A list of all files that need to be processed
 
     # If the input path points to a file handle as if it was dir with one file
     if not is_input_dir:
-        files.append(FileSpec.from_path(in_path))
+        input_file_paths.append(PurePath(in_path))
     else:
-        files = gather_files(in_path, file_types.split(","), pattern)
+        files = gather_files(PurePath(in_path), file_types.split(","), pattern)
 
     # Pre-compute output file names to check for name collisions before doing
     # any work.
-    output_file_specs: list[FileSpec] = [
-        to_output_path(ifs, out_path, prefix, suffix, output_file_type) for ifs in files
-    ]
+    output_file_paths = [PurePath(out_path) / f.name for f in input_file_paths]
 
     if not overwrite:
-        collisions: list[FileSpec] = [fs for fs in output_file_specs if fs.exists]
+        collisions: list[PurePath] = [fs for fs in output_file_paths if os.path.exists(fs)]
 
         if len(collisions) > 0:
             logger.error("Name collision detected. The following files already exist:")
@@ -173,11 +172,11 @@ def mark(
             logger.error("To ignore file name collisions, run with --overwrite " "true")
             sys.exit(-1)
 
-    for file_spec_in, file_spec_out in zip(files, output_file_specs):
+    for path_in, path_out in zip(input_file_paths, output_file_paths):
         threading.Thread(
             target=apply_watermark,
-            name=f"Watermark: {file_spec_in}",
-            args=(file_spec_in, file_spec_out, mark_path, corner, 0.05),
+            name=f"Watermark: {path_in}",
+            args=(path_in, path_out, mark_path, corner, 0.05),
         )
 
 
