@@ -2,14 +2,10 @@
 A collection of helper functions relating to managing files
 """
 
-import dataclasses
 import os.path
 import re
-from os import PathLike
-from pathlib import Path, PurePath
+from pathlib import PurePath
 from typing import Optional
-
-from pathvalidate import validate_filepath
 
 
 def update_file_name(original_name: str, prefix: str | None, suffix: str | None) -> str:
