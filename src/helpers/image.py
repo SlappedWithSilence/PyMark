@@ -1,6 +1,7 @@
 from pathlib import PurePath
 
 from PIL import Image
+from PIL.Image import Resampling
 
 ALLOWED_CORNERS: list[str] = ["bottom_left", "bottom_right", "top_left", "top_right"]
 
@@ -96,3 +97,5 @@ def apply_watermark(
             padding_size: int = round(
                 (im_length if shortest_side == "l" else im_width) * padding
             )
+
+            watermark.resize(watermark_dims, Resampling.LANCZOS)
