@@ -43,7 +43,7 @@ To use the linters:
 **TIP**: _You can also configure Ruff to [run as a pre-commit hook.](https://docs.astral.sh/ruff/integrations/#pre-commit)_
 ## Testing
 
-TODO
+From the root directory of the repository, run: `python -m pytest`
 
 ## Known Issues
 

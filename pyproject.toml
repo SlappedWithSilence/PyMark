@@ -24,10 +24,16 @@ dependencies = [
     "typer",
     "pathvalidate"
 ]
+readme = "README.md"
 
 [project.optional-dependencies]
 ci = [
     "pytest",
     "ruff",
     "pylint"
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
 ]
