@@ -31,12 +31,11 @@ def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float)
     # Determine which dimension of the image is the shortest to avoid clipping in extreme situations
     image_shortest_side: str = "h" if image_w >= image_h else "w"
     wm_calc_side: int = wm_max_w if image_shortest_side == "w" else wm_max_h
-    i_calc_side: int = image_w if image_shortest_side == "w" else image_h
 
     # Using the shortest side of the image, determine how much the watermark needs to be resized
     resize_factor: float = wm_calc_side / (wm_h if image_shortest_side == "h" else wm_w)
 
-    if round(wm_h * resize_factor) > wm_max_h or round(wm_w * resize_factor) > wm_max_w or 0 in [wm_w, wm_h]:
+    if round(wm_h * resize_factor) > wm_max_h or round(wm_w * resize_factor) > wm_max_w or 0 in [wm_max_w, wm_max_h]:
         logger.error("Failed to calculate a resize plan for watermark!")
         logger.debug(f"Image: {image}")
         logger.debug(f"Watermark: {watermark}")
