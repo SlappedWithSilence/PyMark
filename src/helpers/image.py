@@ -7,7 +7,7 @@ from loguru import logger
 ALLOWED_CORNERS: list[str] = ["bottom_left", "bottom_right", "top_left", "top_right"]
 
 
-def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float) -> tuple[int, int]:
+def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float) -> tuple[int, int] | None:
     """
     A small helper function that determines what size the watermark should be based on watermark original size, image
     size, and watermark ratio.
@@ -24,7 +24,7 @@ def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float)
         raise TypeError(f"watermark must be of type Image! Got {type(watermark)} instead.")
 
     image_w, image_h = image.size  # Original dims of image
-    wm_w, wm_h = watermark.size   # Original dims of watermark
+    wm_w, wm_h = watermark.size  # Original dims of watermark
     wm_max_w: int = round(image_w * ratio)  # Max allowed length of watermark width
     wm_max_h: int = round(image_h * ratio)  # Max allowed length of watermark height
 
@@ -42,6 +42,7 @@ def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float)
         logger.debug(f"h: {wm_h * resize_factor}, max_h: {wm_max_h}")
         logger.debug(f"w: {wm_w * resize_factor}, max_w: {wm_max_w}")
         logger.debug(f"resize_by: {resize_factor}")
+        return None
 
     return round(wm_h * resize_factor), round(wm_w * resize_factor)
 
@@ -67,6 +68,7 @@ def apply_watermark(
     :param relative_size: The size of the watermark relative to the image
     :return: None
     """
+    logger.info("Watermarking...")
 
     # Type Checking
     if not isinstance(path_in, PurePath):
@@ -99,43 +101,35 @@ def apply_watermark(
     if corner.lower() not in ALLOWED_CORNERS:
         raise ValueError(f"Invalid corner value. Allowed values are: {ALLOWED_CORNERS}")
 
-    if padding >= 1.0 or padding <= 0.0:
+    if padding >= 1.0 or padding < 0.0:
         raise ValueError(
             f"Invalid padding value. Must be a float less than 1.0. Got {padding}"
         )
 
-    if relative_size >= 1.0 or padding <= 0.0:
+    if relative_size >= 1.0 or relative_size <= 0.0:
         raise ValueError(
             f"Invalid relative_size value. Must be a float less than 1.0. Got {relative_size}"
         )
 
     with Image.open(path_in) as image:
         with Image.open(watermark_path) as watermark:
-            im_length, im_width = image.size
-            watermark_length, watermark_width = watermark.size
+            watermark_dims = get_watermark_size(image, watermark, relative_size)
 
-            # Determine which side of the image is shortest
-            shortest_side: str = "l" if im_length <= im_width else "w"
+            if not watermark_dims:
+                exit(-1)
 
-            # Calculate the projected size of the corresponding side of the watermark
-            watermark_adjusted_len: float = (
-                                                im_length if shortest_side == "l" else im_width
-                                            ) * relative_size
+            resized_watermark = watermark.resize(watermark_dims, Resampling.LANCZOS)
+            padding_size = min(image.size) * padding  # Num pixels to pad. Used as a pos offset later
 
-            # Determine ratio of current watermark size to expected watermark size
-            watermark_scalar: float = (
-                                          watermark_length if shortest_side == "l" else watermark_width
-                                      ) / watermark_adjusted_len
+            new_image = Image.new("RGB", image.size, (250, 250, 250))
+            new_image.paste(image, (0, 0))
 
-            # Calculate expected dimensions of post-scaled watermark
-            watermark_dims: tuple[int, int] = (
-                round(watermark_length / watermark_scalar),
-                round(watermark_width / watermark_scalar),
-            )
+            corner_pos_map = {
+                "bottom_left": (padding_size, image.size[1] - padding_size),
+                "bottom_right": (image.size[0] - padding_size, image.size[1] - padding_size),
+                "top_left": (padding_size, padding_size),
+                "top_right": (image.size[0] - padding_size, padding_size)
+            }
 
-            # Calculate size of padding based on shortest side of image
-            padding_size: int = round(
-                (im_length if shortest_side == "l" else im_width) * padding
-            )
-
-            watermark.resize(watermark_dims, Resampling.LANCZOS)
+            new_image.paste(resized_watermark, corner_pos_map[corner])
+            new_image.save(path_out)
