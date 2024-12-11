@@ -4,7 +4,8 @@ import pytest
 from src.helpers.image import get_watermark_size
 
 cases = [
-    ((100, 100), (100, 100), 0.5, (50, 50))
+    ((100, 100), (100, 100), 0.5, (50, 50)),
+    ((20, 100), (60, 20), 0.25, (2, 5))
 ]
 
 

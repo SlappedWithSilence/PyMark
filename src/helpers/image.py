@@ -2,6 +2,7 @@ from pathlib import PurePath
 
 from PIL import Image
 from PIL.Image import Resampling
+from loguru import logger
 
 ALLOWED_CORNERS: list[str] = ["bottom_left", "bottom_right", "top_left", "top_right"]
 
@@ -22,14 +23,28 @@ def get_watermark_size(image: Image.Image, watermark: Image.Image, ratio: float)
     if not isinstance(watermark, Image.Image):
         raise TypeError(f"watermark must be of type Image! Got {type(watermark)} instead.")
 
-    # See: https://stackoverflow.com/questions/3971841/how-to-resize-images-proportionally-keeping-the-aspect-ratio
-    image_w, image_h = image.size
-    watermark_max_w = image_w * ratio
-    watermark_max_h = image_h * ratio
-    watermark_w, watermark_h = watermark.size
-    watermark_dims_ratio = min(watermark_max_w / watermark_w, watermark_max_h / watermark_h)
+    image_w, image_h = image.size  # Original dims of image
+    wm_w, wm_h = watermark.size   # Original dims of watermark
+    wm_max_w: int = round(image_w * ratio)  # Max allowed length of watermark width
+    wm_max_h: int = round(image_h * ratio)  # Max allowed length of watermark height
 
-    return round(watermark_w * watermark_dims_ratio), round(watermark_max_h * watermark_dims_ratio)
+    # Determine which dimension of the image is the shortest to avoid clipping in extreme situations
+    image_shortest_side: str = "h" if image_w >= image_h else "w"
+    wm_calc_side: int = wm_max_w if image_shortest_side == "w" else wm_max_h
+    i_calc_side: int = image_w if image_shortest_side == "w" else image_h
+
+    # Using the shortest side of the image, determine how much the watermark needs to be resized
+    resize_factor: float = wm_calc_side / (wm_h if image_shortest_side == "h" else wm_w)
+
+    if round(wm_h * resize_factor) > wm_max_h or round(wm_w * resize_factor) > wm_max_w or 0 in [wm_w, wm_h]:
+        logger.error("Failed to calculate a resize plan for watermark!")
+        logger.debug(f"Image: {image}")
+        logger.debug(f"Watermark: {watermark}")
+        logger.debug(f"h: {wm_h * resize_factor}, max_h: {wm_max_h}")
+        logger.debug(f"w: {wm_w * resize_factor}, max_w: {wm_max_w}")
+        logger.debug(f"resize_by: {resize_factor}")
+
+    return round(wm_h * resize_factor), round(wm_w * resize_factor)
 
 
 def apply_watermark(
