@@ -173,11 +173,17 @@ def mark(
             sys.exit(-1)
 
     for path_in, path_out in zip(input_file_paths, output_file_paths):
+        logger.info("Dispatching job...")
+
+        """
         threading.Thread(
             target=apply_watermark,
             name=f"Watermark: {path_in}",
             args=(path_in, path_out, mark_path, corner, 0.05),
         )
+        """
+
+        apply_watermark(path_in, path_out, PurePath(mark_path), corner, 0.05, 0.10)
 
 
 if __name__ == "__main__":
