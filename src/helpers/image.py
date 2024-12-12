@@ -81,7 +81,7 @@ def apply_watermark(
             f"file_spec_out must be a PurePath. Got a {type(path_out)} instead."
         )
 
-    if not isinstance(watermark_path, str):
+    if not isinstance(watermark_path, PurePath):
         raise TypeError(
             f"watermark_path must be a PurePath. Got a {type(watermark_path)} instead."
         )
@@ -118,10 +118,10 @@ def apply_watermark(
             if not watermark_dims:
                 exit(-1)
 
-            resized_watermark = watermark.resize(watermark_dims, Resampling.LANCZOS)
-            padding_size = min(image.size) * padding  # Num pixels to pad. Used as a pos offset later
+            resized_watermark: Image = watermark.resize(watermark_dims, Resampling.LANCZOS)
+            padding_size: int = round(min(image.size) * padding)  # Num pixels to pad. Used as a pos offset later
 
-            new_image = Image.new("RGB", image.size, (250, 250, 250))
+            new_image: Image = Image.new("RGB", image.size, (250, 250, 250))
             new_image.paste(image, (0, 0))
 
             corner_pos_map = {

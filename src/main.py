@@ -135,21 +135,6 @@ def mark(
             f"Input path supplied is not a valid file or " f"directory: {in_path}"
         )
 
-    # Validate output path
-    if os.path.isdir(out_path) and not is_input_dir:
-        raise IsADirectoryError(
-            "Input path was a file and output path was a "
-            "directory. User must supply a path that points"
-            " to a file."
-        )
-
-    if os.path.isfile(out_path) and is_input_dir:
-        raise NotADirectoryError(
-            "Input path was a directory and output path "
-            "was a file. User must supply a path that "
-            "points to a directory."
-        )
-
     input_file_paths: list[PurePath] = []  # A list of all files that need to be processed
 
     # If the input path points to a file handle as if it was dir with one file
@@ -160,7 +145,7 @@ def mark(
 
     # Pre-compute output file names to check for name collisions before doing
     # any work.
-    output_file_paths = [PurePath(out_path) / f.name for f in input_file_paths]
+    output_file_paths = [PurePath(out_path) / (f.stem + suffix + f.suffix) for f in input_file_paths]
 
     if not overwrite:
         collisions: list[PurePath] = [fs for fs in output_file_paths if os.path.exists(fs)]
