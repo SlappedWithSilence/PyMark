@@ -125,10 +125,10 @@ def apply_watermark(
             new_image.paste(image, (0, 0))
 
             corner_pos_map = {
-                "bottom_left": (padding_size, image.size[1] - padding_size),
-                "bottom_right": (image.size[0] - padding_size, image.size[1] - padding_size),
+                "bottom_left": (padding_size, image.size[1] - padding_size - watermark_dims[1]),
+                "bottom_right": (image.size[0] - padding_size - watermark_dims[0], image.size[1] - padding_size - watermark_dims[1]),
                 "top_left": (padding_size, padding_size),
-                "top_right": (image.size[0] - padding_size, padding_size)
+                "top_right": (image.size[0] - padding_size - watermark_dims[0], padding_size)
             }
 
             new_image.paste(resized_watermark, corner_pos_map[corner])
